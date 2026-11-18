@@ -3,6 +3,11 @@
 {
   "name": "jiwalu-web",
   "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "jiwaluphotobooth.com", "custom_domain": true },
+    { "pattern": "www.jiwaluphotobooth.com", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./dist",
     "not_found_handling": "404-page"
