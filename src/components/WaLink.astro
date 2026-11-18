@@ -1,0 +1,12 @@
+---
+// Link WhatsApp. Link dibuat saat build, jadi tidak perlu JavaScript di browser.
+import { wa, type Jalur } from "../data/kontak";
+
+interface Props {
+  jalur?: Jalur;
+  pesan?: string;
+  class?: string;
+}
+const { jalur = "event", pesan = "Halo Jiwalu!", class: cls } = Astro.props;
+---
+<a class={cls} href={wa(jalur, pesan)} target="_blank" rel="noopener"><slot /></a>

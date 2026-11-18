@@ -1,0 +1,22 @@
+---
+// Hero untuk halaman sewa dan usaha: judul besar di kiri, foto di kanan.
+interface Props {
+  judul: string;
+  foto: string;
+  alt: string;
+  fotoRasio?: string;
+}
+const { judul, foto, alt, fotoRasio } = Astro.props;
+---
+<header class="u-hero">
+  <div class="u-hero-main">
+    <div>
+      <h1 class="h-xl">{judul}</h1>
+      <p class="lede"><slot name="lede" /></p>
+      <div class="u-hero-actions"><slot name="actions" /></div>
+    </div>
+    <div class="u-hero-photo">
+      <img src={foto} alt={alt} style={fotoRasio ? `aspect-ratio:${fotoRasio}` : undefined} />
+    </div>
+  </div>
+</header>

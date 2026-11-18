@@ -1,0 +1,26 @@
+---
+// Deretan foto yang bergeser ke samping saat halaman di-scroll.
+import { REEL, foto } from "../data/galeri";
+---
+<div class="reel" aria-hidden="true">
+  <div class="reel-track" id="reel">
+    {REEL.map((f) => <img src={foto(f)} alt="" loading="lazy" />)}
+  </div>
+</div>
+
+<script>
+  const reel = document.getElementById("reel");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reel && !reduced) {
+    let ticking = false;
+    const move = () => {
+      const r = reel.parentElement!.getBoundingClientRect();
+      const p = (innerHeight - r.top) / (innerHeight + r.height);
+      const max = reel.scrollWidth - innerWidth;
+      reel.style.transform = `translateX(${-Math.max(0, Math.min(1, p)) * max}px)`;
+      ticking = false;
+    };
+    addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(move); } }, { passive: true });
+    move();
+  }
+</script>

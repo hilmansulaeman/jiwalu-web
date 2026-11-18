@@ -1,0 +1,104 @@
+---
+// Strip foto krom 3D di hero beranda. Kalau WebGL tidak tersedia, tampil strip gambar biasa.
+import { STRIP_HERO, foto } from "../data/galeri";
+---
+<div class="stage" id="stage" aria-hidden="true" data-photos={JSON.stringify(STRIP_HERO.map(foto))}>
+  <div class="fallback">
+    <div class="strip">
+      {STRIP_HERO.map((f) => <img src={foto(f)} alt="" />)}
+    </div>
+  </div>
+</div>
+
+<script>
+  import * as THREE from "three";
+  import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+
+  const stage = document.getElementById("stage") as HTMLDivElement;
+  const photos: string[] = JSON.parse(stage.dataset.photos || "[]");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  try {
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.95;
+    stage.appendChild(renderer.domElement);
+    stage.classList.add("webgl");
+
+    const scene = new THREE.Scene();
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+
+    // Bentuk strip dengan 3 lubang jendela foto
+    const W = 2.1, R = 0.18, pad = 0.16, fw = W - pad * 2, fh = (fw * 2) / 3, gap = 0.16;
+    const H = pad + fh * 3 + gap * 2 + 0.7;
+    const rounded = (p: THREE.Path, x: number, y: number, w: number, h: number, r: number) => {
+      p.moveTo(x + r, y);
+      p.lineTo(x + w - r, y); p.quadraticCurveTo(x + w, y, x + w, y + r);
+      p.lineTo(x + w, y + h - r); p.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      p.lineTo(x + r, y + h); p.quadraticCurveTo(x, y + h, x, y + h - r);
+      p.lineTo(x, y + r); p.quadraticCurveTo(x, y, x + r, y);
+    };
+    const shape = new THREE.Shape();
+    rounded(shape, -W / 2, -H / 2, W, H, R);
+    const top = H / 2 - pad;
+    const frames: number[] = [];
+    for (let i = 0; i < 3; i++) {
+      const y = top - fh - i * (fh + gap);
+      const hole = new THREE.Path();
+      rounded(hole, -fw / 2, y, fw, fh, 0.05);
+      shape.holes.push(hole);
+      frames.push(y + fh / 2);
+    }
+    const geo = new THREE.ExtrudeGeometry(shape, { depth: 0.12, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.04, bevelSegments: 6, curveSegments: 24 });
+    geo.center();
+    const chrome = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 1, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.04 });
+    const strip = new THREE.Group();
+    strip.add(new THREE.Mesh(geo, chrome));
+
+    const loader = new THREE.TextureLoader();
+    photos.forEach((src, i) => {
+      const mat = new THREE.MeshBasicMaterial({ color: 0xdfe4ea });
+      loader.load(src, (t) => { t.colorSpace = THREE.SRGBColorSpace; mat.map = t; mat.color.set(0xffffff); mat.needsUpdate = true; });
+      const plane = new THREE.Mesh(new THREE.PlaneGeometry(fw, fh), mat);
+      plane.position.set(0, frames[i], -0.02);
+      strip.add(plane);
+      const back = plane.clone(); back.rotation.y = Math.PI; back.position.z = -0.1; strip.add(back);
+    });
+    scene.add(strip);
+    strip.rotation.set(0.15, -0.5, -0.32);
+
+    const resize = () => {
+      const { width, height } = stage.getBoundingClientRect();
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.position.z = Math.max(12.5, 10.5 / camera.aspect);
+      camera.updateProjectionMatrix();
+    };
+    new ResizeObserver(resize).observe(stage);
+    resize();
+
+    let mx = 0, my = 0;
+    addEventListener("pointermove", (e) => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; }, { passive: true });
+
+    const timer = new THREE.Clock();
+    let visible = true;
+    new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(stage);
+    const loop = () => {
+      requestAnimationFrame(loop);
+      if (!visible) return;
+      const t = timer.getElapsedTime();
+      const spin = reduced ? 0 : t * 0.35;
+      strip.rotation.y += (-0.5 + Math.sin(spin) * 0.9 + mx * 0.8 - strip.rotation.y) * 0.05;
+      strip.rotation.x += (0.15 + my * 0.5 - strip.rotation.x) * 0.05;
+      strip.position.y = reduced ? 0 : Math.sin(t * 0.8) * 0.12;
+      renderer.render(scene, camera);
+    };
+    loop();
+  } catch (err) {
+    console.warn("WebGL tidak tersedia, pakai gambar statis.", err);
+  }
+</script>

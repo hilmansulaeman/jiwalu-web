@@ -1,0 +1,95 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+import WaLink from "../components/WaLink.astro";
+import Steps from "../components/Steps.astro";
+import Faq from "../components/Faq.astro";
+import { TEMPLATE } from "../data/kontak";
+import { PAKET_USAHA, ALUR_BOOTH, LANGGANAN, CARA_MULAI, FAQ_USAHA, HARGA_USAHA_TERMURAH } from "../data/usaha";
+import { FOTO, foto } from "../data/galeri";
+---
+<Base
+  title="Buka Usaha Photobooth | Jiwalu"
+  description={`Paket alat photobooth dari Jiwalu: printer, mini PC, monitor touchscreen, kamera, lensa, sistem photobooth dengan pembayaran QRIS, dan training. Belum termasuk box. Mulai ${HARGA_USAHA_TERMURAH}.`}
+  aktif="usaha"
+  jalur="usaha"
+  pesanNav={TEMPLATE.usaha}
+  adaFaq
+>
+  <main>
+    <PageHero judul="Paket alat photobooth" foto={foto("foto-17.jpg")} alt="Photobox Jiwalu dengan tirai biru">
+      <Fragment slot="lede">Untuk yang mau buka usaha photobooth sendiri. Isinya printer, kamera DSLR, layar sentuh, mini PC, sistem photobooth, dan training. Box booth belum termasuk. Mulai {HARGA_USAHA_TERMURAH}.</Fragment>
+      <Fragment slot="actions">
+        <WaLink class="btn" jalur="usaha" pesan={TEMPLATE.usaha}>Konsultasi lewat WhatsApp</WaLink>
+        <WaLink class="btn btn-ghost" jalur="usaha" pesan={TEMPLATE.box}>Request box</WaLink>
+      </Fragment>
+    </PageHero>
+
+    <section class="sec" id="paket">
+      <div class="wrap">
+        <h2 class="h-lg">Pilih paket</h2>
+        <p class="lede" style="margin-top:20px">Ketiga paket beda di printer. Kamera, layar sentuh, mini PC, sistem, dan training sama.</p>
+        <div class="packs">
+          {PAKET_USAHA.map((p) => (
+            <details class="pack">
+              <summary>
+                <span class="h-md">{p.nama}<span class="tag">{p.ringkas}</span></span>
+                <span class="amt">{p.harga}</span><span class="tog" aria-hidden="true"></span>
+              </summary>
+              <ul class="pack-body">
+                {p.alat.map((a) => <li><b>{a.nama}</b>{a.ket}</li>)}
+              </ul>
+            </details>
+          ))}
+        </div>
+        <p class="subnote"><b>Harga hanya untuk alat, sistem, dan training.</b> Box booth belum termasuk, tapi bisa kamu request. Langganan sistem bulan pertama sudah termasuk.</p>
+        <p style="margin-top:20px"><WaLink class="link" jalur="usaha" pesan={TEMPLATE.box}>Request box lewat WhatsApp</WaLink></p>
+      </div>
+    </section>
+
+    <section class="sec" id="alur">
+      <div class="wrap">
+        <div class="flow-wrap">
+          <img src={foto("foto-19.jpg")} alt={FOTO["foto-19.jpg"]} loading="lazy" />
+          <div>
+            <h2 class="h-lg">Alur pelanggan di booth</h2>
+            <ol class="flow">
+              {ALUR_BOOTH.map((s) => <li><div><b>{s.judul}</b><span>{s.isi}</span></div></li>)}
+            </ol>
+            <div style="margin-top:36px"><WaLink class="btn" jalur="usaha" pesan={TEMPLATE.usaha}>Konsultasi paket usaha</WaLink></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="langganan">
+      <div class="wrap">
+        <h2 class="h-lg">Langganan sistem</h2>
+        <p class="lede" style="margin-top:20px">Bulan pertama sudah termasuk di harga paket, memakai tier Lite. Mulai bulan kedua, kamu bayar langganan sendiri.</p>
+        <div class="table-scroll">
+          <table class="sub-table">
+            <thead><tr><th scope="col">Tier</th><th scope="col">1 bulan</th><th scope="col">6 bulan</th><th scope="col">1 tahun</th></tr></thead>
+            <tbody>
+              {LANGGANAN.map((l) => (
+                <tr class={l.utama ? "on" : undefined}>
+                  <th scope="row">{l.tier}<span>{l.ket}</span></th>
+                  <td>{l.bulan}</td><td>{l.enamBulan}</td><td>{l.tahun}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <Steps judul="Cara mulai" id="mulai" items={CARA_MULAI} />
+
+    <Faq items={FAQ_USAHA.slice(0, 1)}>
+      <details>
+        <summary>Paket sudah termasuk box booth?</summary>
+        <p>Belum. Paket hanya berisi alat, sistem photobooth, dan training. Box bisa kamu request lewat <WaLink class="link" jalur="usaha" pesan={TEMPLATE.box}>WhatsApp</WaLink>: pesannya sudah berisi daftar yang perlu kamu isi.</p>
+      </details>
+      {FAQ_USAHA.slice(1).map((it) => <details><summary>{it.q}</summary><p>{it.a}</p></details>)}
+    </Faq>
+  </main>
+</Base>

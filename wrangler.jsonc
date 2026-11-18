@@ -1,0 +1,10 @@
+// Konfigurasi deploy ke Cloudflare Workers (static assets).
+// Situs ini statis: hasil `npm run build` ada di folder dist/.
+{
+  "name": "jiwalu-web",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

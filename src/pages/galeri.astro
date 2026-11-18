@@ -1,0 +1,95 @@
+---
+import Base from "../layouts/Base.astro";
+import { TEMPLATE } from "../data/kontak";
+import { ALBUM, foto } from "../data/galeri";
+
+const dataAlbum = ALBUM.map((a) => ({ judul: a.judul, foto: a.foto.map(foto) }));
+---
+<Base
+  title="Galeri | Jiwalu Photobooth"
+  description="Hasil foto pelanggan di booth Jiwalu Photobooth. #PoseWithJiwalu"
+  ogImage="/photos/foto-04.jpg"
+  aktif="galeri"
+  pesanNav={TEMPLATE.umum}
+>
+  <main>
+    <section class="g-head">
+      <div class="wrap">
+        <h1 class="h-lg g-title">Galeri</h1>
+        <p class="g-sub">Foto pelanggan di photobox Jiwalu. Tag fotomu dengan #PoseWithJiwalu.</p>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div class="works" id="works" data-album={JSON.stringify(dataAlbum)}>
+        {ALBUM.map((a, i) => (
+          <button class="work" data-a={i} aria-label={`Buka album ${a.judul}, ${a.foto.length} foto`}>
+            <span class="work-img"><img src={foto(a.foto[0])} alt="" loading="lazy" /></span>
+            <span class="work-title">{a.judul}</span>
+            <span class="work-desc">{a.foto.length} foto. {a.ket}</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <div class="view-pill" id="pill" aria-hidden="true">Lihat</div>
+
+  <dialog class="lb" id="lb" aria-label="Foto">
+    <img id="lb-img" src="" alt="" />
+    <div class="lb-bar">
+      <span id="lb-count"></span>
+      <div>
+        <button id="lb-prev" aria-label="Foto sebelumnya">Sebelumnya</button>
+        <button id="lb-next" aria-label="Foto berikutnya">Berikutnya</button>
+        <button id="lb-close" aria-label="Tutup">Tutup</button>
+      </div>
+    </div>
+  </dialog>
+</Base>
+
+<script>
+  type AlbumData = { judul: string; foto: string[] };
+  const works = document.getElementById("works") as HTMLDivElement;
+  const albums: AlbumData[] = JSON.parse(works.dataset.album || "[]");
+  const lb = document.getElementById("lb") as HTMLDialogElement;
+  const img = document.getElementById("lb-img") as HTMLImageElement;
+  const count = document.getElementById("lb-count") as HTMLSpanElement;
+  let album = 0, cur = 0;
+  let opener: HTMLElement | null = null;
+
+  const show = (i: number) => {
+    const list = albums[album].foto;
+    cur = (i + list.length) % list.length;
+    img.src = list[cur];
+    img.alt = `${albums[album].judul}, foto ${cur + 1}`;
+    count.textContent = `${albums[album].judul}  ${cur + 1} / ${list.length}`;
+  };
+
+  works.addEventListener("click", (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>(".work");
+    if (!b) return;
+    opener = b; album = Number(b.dataset.a); show(0); lb.showModal();
+  });
+  document.getElementById("lb-prev")!.onclick = () => show(cur - 1);
+  document.getElementById("lb-next")!.onclick = () => show(cur + 1);
+  document.getElementById("lb-close")!.onclick = () => lb.close();
+  lb.addEventListener("click", (e) => { if (e.target === lb) lb.close(); });
+  lb.addEventListener("close", () => opener?.focus());
+  addEventListener("keydown", (e) => {
+    if (!lb.open) return;
+    if (e.key === "ArrowRight") show(cur + 1);
+    if (e.key === "ArrowLeft") show(cur - 1);
+  });
+
+  // Label "Lihat" yang ikut kursor di atas foto album
+  const pill = document.getElementById("pill") as HTMLDivElement;
+  if (matchMedia("(pointer: fine)").matches) {
+    works.addEventListener("pointermove", (e) => {
+      const over = (e.target as HTMLElement).closest(".work-img");
+      pill.classList.toggle("on", !!over);
+      pill.style.transform = `translate(${e.clientX + 14}px, ${e.clientY + 14}px)`;
+    });
+    works.addEventListener("pointerleave", () => pill.classList.remove("on"));
+  }
+</script>

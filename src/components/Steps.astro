@@ -1,0 +1,16 @@
+---
+interface Props {
+  judul: string;
+  id?: string;
+  items: { judul: string; isi: string }[];
+}
+const { judul, id, items } = Astro.props;
+---
+<section class="sec" id={id}>
+  <div class="wrap">
+    <h2 class="h-lg">{judul}</h2>
+    <ol class="steps">
+      {items.map((s) => <li><b>{s.judul}</b><span>{s.isi}</span></li>)}
+    </ol>
+  </div>
+</section>

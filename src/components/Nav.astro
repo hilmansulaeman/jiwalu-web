@@ -1,0 +1,25 @@
+---
+import WaLink from "./WaLink.astro";
+import type { Jalur } from "../data/kontak";
+
+interface Props {
+  aktif?: "sewa" | "usaha" | "galeri" | "beranda";
+  jalur: Jalur;
+  pesan: string;
+}
+const { aktif, jalur, pesan } = Astro.props;
+const menu = [
+  { href: "/sewa", label: "Sewa event", key: "sewa" },
+  { href: "/#photobox", label: "Photobox", key: "photobox" },
+  { href: "/usaha", label: "Buka usaha", key: "usaha" },
+];
+---
+<nav class="nav" aria-label="Utama">
+  <a href="/">Jiwalu Photobooth</a>
+  <div class="menu">
+    {menu.map((m) => (
+      <a href={m.href} aria-current={m.key === aktif ? "page" : undefined}>{m.label}</a>
+    ))}
+  </div>
+  <WaLink class="cta" jalur={jalur} pesan={pesan}>Chat WhatsApp</WaLink>
+</nav>

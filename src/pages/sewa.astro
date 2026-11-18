@@ -1,0 +1,77 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHero from "../components/PageHero.astro";
+import WaLink from "../components/WaLink.astro";
+import Steps from "../components/Steps.astro";
+import Faq from "../components/Faq.astro";
+import { TEMPLATE } from "../data/kontak";
+import { JENIS_SEWA, ADDON, TERMASUK, CARA_PESAN, FAQ_SEWA, HARGA_TERMURAH } from "../data/sewa";
+import { FOTO, foto } from "../data/galeri";
+
+const trio = ["foto-13.jpg", "foto-12.jpg", "foto-11.jpg"];
+---
+<Base
+  title="Sewa Photobooth Event | Jiwalu"
+  description={`Sewa photobooth Jiwalu untuk wedding, ulang tahun, dan acara kantor di Jakarta. Paket Unlimited dan Limited mulai ${HARGA_TERMURAH}, cetak langsung, softcopy lewat QR.`}
+  ogImage="/photos/foto-04.jpg"
+  aktif="sewa"
+  pesanNav="Halo Jiwalu, saya mau tanya sewa photobooth untuk acara."
+  adaFaq
+>
+  <main>
+    <PageHero judul="Sewa photobooth" foto={foto("foto-04.jpg")} alt={FOTO["foto-04.jpg"]} fotoRasio="4/5">
+      <Fragment slot="lede">Untuk wedding, ulang tahun, dan acara kantor di Jakarta dan sekitarnya. Paling murah {HARGA_TERMURAH} untuk 4 jam.</Fragment>
+      <Fragment slot="actions">
+        <WaLink class="btn" pesan={TEMPLATE.cekJadwal}>Cek jadwal lewat WhatsApp</WaLink>
+        <a class="btn btn-ghost" href="#harga">Lihat harga</a>
+      </Fragment>
+    </PageHero>
+
+    <section class="sec" id="harga">
+      <div class="wrap">
+        <h2 class="h-lg">Harga paket</h2>
+        <p class="lede" style="margin:20px 0 64px">Unlimited bebas cetak selama durasi sewa. Limited memakai voucher: 1 voucher untuk 1 cetakan.</p>
+        <div class="tiers" style="margin-top:0">
+          {JENIS_SEWA.map((jenis) => (
+            <div>
+              <div class="tier-head">
+                <h3 class="h-md">{jenis.nama}</h3>
+                <p>{jenis.keterangan}</p>
+              </div>
+              <div class="plans">
+                {jenis.paket.map((p) => (
+                  <article class="plan">
+                    <h3>{p.nama}</h3>
+                    <div class="price"><strong>{p.harga}</strong>{p.hargaCoret && <s>{p.hargaCoret}</s>}</div>
+                    <ul>{p.isi.map((i) => <li>{i}</li>)}</ul>
+                    <WaLink class="link" pesan={`Halo Jiwalu, saya mau pesan ${jenis.nama} ${p.nama}.`}>
+                      Pesan {jenis.nama} {p.nama.replace("Paket ", "")}
+                    </WaLink>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))}
+          <div class="addons">
+            {ADDON.map((a) => <p><b>{a.nama}</b> {a.harga}</p>)}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="termasuk">
+      <div class="wrap">
+        <h2 class="h-lg">Ada di semua paket</h2>
+        <div class="trio">
+          {trio.map((f) => <img src={foto(f)} alt={FOTO[f]} loading="lazy" />)}
+        </div>
+        <ul class="checklist">
+          {TERMASUK.map((t) => <li><div><b>{t.judul}</b><span>{t.isi}</span></div></li>)}
+        </ul>
+      </div>
+    </section>
+
+    <Steps judul="Cara pesan" id="pesan" items={CARA_PESAN} />
+    <Faq items={FAQ_SEWA} />
+  </main>
+</Base>

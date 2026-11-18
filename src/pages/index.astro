@@ -1,0 +1,85 @@
+---
+import Base from "../layouts/Base.astro";
+import Hero3D from "../components/Hero3D.astro";
+import Reel from "../components/Reel.astro";
+import { TEMPLATE } from "../data/kontak";
+import { HARGA_TERMURAH } from "../data/sewa";
+import { HARGA_USAHA_TERMURAH } from "../data/usaha";
+import { PHOTOBOX } from "../data/photobox";
+import { FOTO, GALERI_BERANDA, foto } from "../data/galeri";
+---
+<Base
+  title="Jiwalu Photobooth"
+  description="Sewa photobooth untuk wedding dan acara di Jakarta, photobox Jiwalu, dan paket alat photobooth untuk buka usaha sendiri."
+  aktif="beranda"
+  pesanNav={TEMPLATE.umum}
+>
+  <main>
+    <header class="hero">
+      <div class="hero-main">
+        <Hero3D />
+        <div class="hero-copy">
+          <h1 class="h-md">Kami bawa photobooth ke acaramu.</h1>
+          <p>Jiwalu menyewakan photobooth untuk wedding dan acara di Jakarta. Kami juga punya photobox sendiri, dan menjual paket alat photobooth untuk yang mau buka usaha.</p>
+        </div>
+      </div>
+      <div class="hero-bar">
+        <div><b class="live">Jakarta, GMT+7</b><span id="clock">--:--</span></div>
+        <div><b>Photobox</b><span>{PHOTOBOX.harga} untuk 2 strip</span></div>
+        <div><b>#PoseWithJiwalu</b><span>Instagram dan TikTok</span></div>
+      </div>
+    </header>
+
+    <nav class="paths" aria-label="Pilih layanan">
+      <a class="path" href="/sewa"><span class="h-lg">Sewa photobooth untuk acara</span><span class="meta">Mulai {HARGA_TERMURAH}</span></a>
+      <a class="path" href="#photobox"><span class="h-lg">Foto di photobox Jiwalu</span><span class="meta">{PHOTOBOX.harga}, bayar QRIS</span></a>
+      <a class="path" href="/usaha"><span class="h-lg">Buka usaha photobooth sendiri</span><span class="meta">Paket alat mulai {HARGA_USAHA_TERMURAH}, tanpa box</span></a>
+    </nav>
+
+    <Reel />
+
+    <section class="sec" id="photobox">
+      <div class="wrap">
+        <h2 class="h-lg">Photobox</h2>
+        <p class="lede" style="margin-top:20px">Datang langsung, bayar pakai QRIS di layar booth, lalu foto sendiri di dalam.</p>
+        <div class="box-grid">
+          <div class="box-photos">
+            <img src={foto("foto-17.jpg")} alt={FOTO["foto-17.jpg"]} loading="lazy" />
+            <img src={foto("foto-18.jpg")} alt={FOTO["foto-18.jpg"]} loading="lazy" />
+          </div>
+          <div class="box-info">
+            <p class="session"><span class="mark">{PHOTOBOX.harga}</span><small>{PHOTOBOX.isi}</small></p>
+            <dl class="facts">
+              <dt>Bayar</dt><dd>{PHOTOBOX.bayar}</dd>
+              <dt>Alamat</dt><dd>{PHOTOBOX.alamat}</dd>
+              <dt>Buka</dt><dd>{PHOTOBOX.jamBuka}</dd>
+            </dl>
+            <p class="note"><b>{PHOTOBOX.promo.judul}</b> {PHOTOBOX.promo.isi}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="galeri">
+      <div class="wrap">
+        <div class="head-row">
+          <h2 class="h-lg">#PoseWithJiwalu</h2>
+          <a class="link" href="/galeri">Lihat semua foto</a>
+        </div>
+        <div class="gallery">
+          {GALERI_BERANDA.map((f) => <img src={foto(f)} alt={FOTO[f]} loading="lazy" />)}
+        </div>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<script>
+  const clock = document.getElementById("clock");
+  if (clock) {
+    const fmt = new Intl.DateTimeFormat("id-ID", { timeZone: "Asia/Jakarta", hour: "2-digit", minute: "2-digit" });
+    const tick = () => (clock.textContent = fmt.format(new Date()) + " WIB");
+    tick();
+    setInterval(tick, 15000);
+  }
+</script>

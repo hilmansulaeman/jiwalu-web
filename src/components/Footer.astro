@@ -1,0 +1,46 @@
+---
+import WaLink from "./WaLink.astro";
+import { KONTAK, formatNomor, instagramUrl, tiktokUrl, type Jalur } from "../data/kontak";
+
+interface Props {
+  /** Nomor yang tampil duluan di kolom WhatsApp. */
+  utama?: Jalur;
+  adaFaq?: boolean;
+}
+const { utama = "event", adaFaq = false } = Astro.props;
+const semua = [
+  { jalur: "event" as const, ket: "Sewa event dan photobox" },
+  { jalur: "usaha" as const, ket: "Paket usaha" },
+];
+const nomor = utama === "usaha" ? [...semua].reverse() : semua;
+---
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div><img src="/img/logo.png" alt="Logo Jiwalu Photobooth" width="96" height="96" /></div>
+      <div>
+        <h4>WhatsApp</h4>
+        {nomor.map((n, i) => (
+          <>
+            <WaLink jalur={n.jalur} class={i ? "foot-gap" : undefined}>{formatNomor(KONTAK[n.jalur])}</WaLink>
+            <p>{n.ket}</p>
+          </>
+        ))}
+      </div>
+      <div>
+        <h4>Sosial</h4>
+        <a href={instagramUrl} target="_blank" rel="noopener">Instagram</a>
+        <a href={tiktokUrl} target="_blank" rel="noopener">TikTok</a>
+      </div>
+      <div>
+        <h4>Halaman</h4>
+        <a href="/sewa">Sewa event</a>
+        <a href="/#photobox">Photobox</a>
+        <a href="/usaha">Buka usaha</a>
+        <a href="/galeri">Galeri</a>
+        {adaFaq && <a href="#faq">Pertanyaan</a>}
+      </div>
+    </div>
+    <div class="legal"><span>© {new Date().getFullYear()} Jiwalu Photobooth</span><span>Jakarta, Indonesia</span></div>
+  </div>
+</footer>
